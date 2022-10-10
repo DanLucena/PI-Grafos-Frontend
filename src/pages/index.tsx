@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import { HomePageMenu } from "../components/HomePageMenu";
+import { PricingSection } from "../components/PricingSection";
 import { HomePageButton } from "../components/HomePageButton";
 import { CreditCard } from "../components/CreditCard";
 import { BackCreditCard } from "../components/BackCreditCard";
@@ -34,7 +35,7 @@ const Home: NextPage = () => {
             <BackCreditCard />
           </div>
         </div>
-        <div className="flex h-2/6 w-full items-center bg-black pl-16 lg:px-16 lg:px-24">
+        <div className="flex h-2/6 w-full items-center bg-black pl-16 lg:px-24">
           <div className="text-white md:mr-16 md:w-8/12 lg:w-5/12 xl:w-3/12">
             <p className="text-4xl font-light">Why Use</p>
             <p className="text-4xl font-semibold">Traveller</p>
@@ -74,7 +75,7 @@ const Home: NextPage = () => {
         </div>
         <div className="mt-8 justify-center text-center lg:mt-10">
           <h1 className="text-2xl font-medium text-neutral-800 md:text-3xl lg:text-4xl">
-            Features That You Get Only
+            Features that you get only
             <br /> in <span className="text-lime-500">Tra</span>veller
           </h1>
           <p className="mx-auto mt-8 max-w-md px-3 text-neutral-500 md:p-0">
@@ -82,6 +83,16 @@ const Home: NextPage = () => {
             mi, malesuada id tempus sed, euismod nec tortor.
           </p>
         </div>
+        <div className="mx-auto mt-12 h-64 w-11/12 max-w-4xl rounded-md bg-neutral-800 px-8 py-10 md:ml-10">
+          <p className="mb-4 text-2xl text-white">Accepted in All Plataforms</p>
+          <p className="max-w-sm text-neutral-500">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tortor
+            mi, malesuada id tempus sed, euismod nec tortor. Suspendisse
+            potenti. Maecenas tempor neque sed finibus congue.Sed tortor mi,
+            malesuada id tempus sed.
+          </p>
+        </div>
+        <PricingSection />
       </section>
     </>
   );

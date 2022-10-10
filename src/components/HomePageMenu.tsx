@@ -9,9 +9,9 @@ const HomePageMenu = () => {
           <span className="text-lime-500">Tra</span>veller
         </h1>
         <CgMenu size="1.8rem" className="cursor-pointer md:hidden" />
-        <ul className="flex hidden md:flex">
-          <li className="cursor-pointer font-semibold">Services</li>
-          <li className="ml-7 cursor-pointer font-semibold">About Us</li>
+        <ul className="hidden md:flex">
+          <li className="cursor-pointer font-semibold">About Us</li>
+          <li className="ml-7 cursor-pointer font-semibold">Services</li>
           <li className="ml-7 cursor-pointer font-semibold">Pricing</li>
           <li className="ml-7 cursor-pointer font-semibold">Partners</li>
         </ul>
