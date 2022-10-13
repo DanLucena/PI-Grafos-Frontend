@@ -6,14 +6,30 @@ import { CreditCard } from "../components/CreditCard";
 import { BackCreditCard } from "../components/BackCreditCard";
 import { BsClockHistory } from "react-icons/bs";
 import { RiCarLine } from "react-icons/ri";
+import { Partners } from "../components/Partners";
+import { ContactArea } from "../components/ContactArea";
+import { Footer } from "../components/Footer";
+import { LoginModal } from "../components/LoginModal";
+import { useState } from "react";
 
 const Home: NextPage = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  function openModal(): void {
+    setIsModalOpen(true);
+  }
+
+  function closeModal(): void {
+    setIsModalOpen(false);
+  }
+
   return (
     <>
       <section className="h-screen overflow-x-hidden">
+        <LoginModal isOpen={isModalOpen} closeModal={closeModal} />
         <div className="flex h-5/6">
           <div className="py-8 px-8 md:px-16 xl:w-9/12">
-            <HomePageMenu />
+            <HomePageMenu openModal={openModal} />
             <h1 className="w-full text-4xl font-medium lg:w-10/12 lg:text-5xl xl:text-6xl 2xl:text-7xl 2xl:leading-[6rem]">
               Make It Easy And Save Money With The Best Mobility
               <br /> Benefits Card
@@ -30,7 +46,7 @@ const Home: NextPage = () => {
             </button>
           </div>
           <div className="relative hidden w-3/12 bg-lime-500 xl:block">
-            <HomePageButton />
+            <HomePageButton openModal={openModal} />
             <CreditCard />
             <BackCreditCard />
           </div>
@@ -73,6 +89,7 @@ const Home: NextPage = () => {
             </div>
           </div>
         </div>
+        <Partners />
         <div className="mt-8 justify-center text-center lg:mt-10">
           <h1 className="text-2xl font-medium text-neutral-800 md:text-3xl lg:text-4xl">
             Features that you get only
@@ -93,6 +110,8 @@ const Home: NextPage = () => {
           </p>
         </div>
         <PricingSection />
+        <ContactArea />
+        <Footer />
       </section>
     </>
   );
