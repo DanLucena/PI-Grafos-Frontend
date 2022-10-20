@@ -10,10 +10,12 @@ import { Partners } from "../components/Partners";
 import { ContactArea } from "../components/ContactArea";
 import { Footer } from "../components/Footer";
 import { LoginModal } from "../components/LoginModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
 
   function openModal(): void {
     setIsModalOpen(true);
@@ -22,6 +24,17 @@ const Home: NextPage = () => {
   function closeModal(): void {
     setIsModalOpen(false);
   }
+
+  function authCheck() {
+    const userToken = localStorage.getItem("userToken");
+    if (userToken) router.push("/profile");
+  }
+
+  useEffect(() => {
+    authCheck();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

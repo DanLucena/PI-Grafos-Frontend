@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "next/router";
 import { FieldValues, useForm } from "react-hook-form";
 import { GrFormClose } from "react-icons/gr";
 import axios from "axios";
@@ -14,14 +15,18 @@ const LoginModal = ({ isOpen, closeModal }: IProps) => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const router = useRouter();
 
   async function sendLoginData(data: FieldValues) {
     const response = await axios.post(
       `http://localhost:3333/companies/login`,
       data
     );
-    const token = response.data;
-    localStorage.setItem("userToken", token);
+    const res = response.data;
+    if (res) {
+      localStorage.setItem("userToken", res.token);
+      router.push("/profile");
+    }
   }
 
   return (
