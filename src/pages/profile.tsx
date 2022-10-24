@@ -3,6 +3,7 @@ import type { NextPage } from "next";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { SideBarMenu } from "../components/SideBarMenu";
+import { ChoosedScreen } from "../components/ChoosedScreen";
 
 const Profile: NextPage = () => {
   const router = useRouter();
@@ -35,8 +36,9 @@ const Profile: NextPage = () => {
   }
 
   return authorized ? (
-    <div className="h-screen">
+    <div className="flex h-screen">
       <SideBarMenu />
+      <ChoosedScreen />
     </div>
   ) : (
     <></>

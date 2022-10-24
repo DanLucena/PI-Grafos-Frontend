@@ -1,0 +1,32 @@
+import React from "react";
+import { ICollaborator } from "../interfaces/Collaborator";
+
+interface IProps {
+  name: string;
+  balance: number;
+  email: string;
+  id: number;
+  cellphone: string;
+  cpf: string;
+  companyId: number;
+  selectCollaborator: (collaborator: ICollaborator) => void;
+}
+
+const CollaboratorCard = (props: IProps) => {
+  return (
+    <div
+      className="mb-2 h-20 w-full cursor-pointer rounded bg-lime-500 p-2"
+      onClick={() => props.selectCollaborator(props)}
+    >
+      <p className="font-normal text-white">{props.name}</p>
+      <p className="text-xs">
+        Email: <span>{props.email}</span>
+      </p>
+      <p className="text-xs">
+        Value: <span>R$ {props.balance}</span>
+      </p>
+    </div>
+  );
+};
+
+export { CollaboratorCard };

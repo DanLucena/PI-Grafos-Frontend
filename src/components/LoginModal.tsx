@@ -44,7 +44,7 @@ const LoginModal = ({ isOpen, closeModal }: IProps) => {
             </div>
             <form
               className="flex flex-col"
-              onSubmit={handleSubmit((data) => sendLoginData(data))}
+              onSubmit={handleSubmit(async (data) => await sendLoginData(data))}
             >
               <div className="mt-5 flex flex-col">
                 <label className="mb-2 font-medium" htmlFor="">
