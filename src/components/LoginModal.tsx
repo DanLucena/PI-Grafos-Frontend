@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { FieldValues, useForm } from "react-hook-form";
 import { GrFormClose } from "react-icons/gr";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 
 interface IProps {
   isOpen: boolean;
@@ -18,20 +19,43 @@ const LoginModal = ({ isOpen, closeModal }: IProps) => {
   const router = useRouter();
 
   async function sendLoginData(data: FieldValues) {
-    const response = await axios.post(
-      `http://localhost:3333/companies/login`,
-      data
-    );
-    const res = response.data;
-    if (res) {
-      localStorage.setItem("userToken", res.token);
-      router.push("/profile");
+    try {
+      const response = await axios.post(
+        `http://localhost:3333/companies/login`,
+        data
+      );
+      const res = response.data;
+      if (res) {
+        localStorage.setItem("userToken", res.token);
+        router.push("/profile");
+      }
+    } catch (e: any) {
+      toast.error(e.response.data.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   }
 
   return (
     isOpen && (
       <>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnHover
+        />
+        <ToastContainer />
         <div className="absolute z-50 flex h-full w-full items-center justify-center bg-black/50">
           <div className="w-10/12 max-w-[417px] rounded-md bg-white p-7 opacity-100">
             <div className="flex">
@@ -80,10 +104,7 @@ const LoginModal = ({ isOpen, closeModal }: IProps) => {
                   <label htmlFor="remember">Remember me</label>
                 </div>
                 <div className="mt-5 flex gap-2">
-                  <button className="h-10 w-6/12 rounded border-2">
-                    Cancel
-                  </button>
-                  <button className="h-10 w-6/12 rounded bg-lime-500 text-white">
+                  <button className="h-10 w-full rounded bg-lime-500 text-white">
                     Login
                   </button>
                 </div>

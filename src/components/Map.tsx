@@ -5,6 +5,9 @@ import React, { useState, useEffect } from "react";
 import { ICollaborator } from "../interfaces/Collaborator";
 import { FieldValues, useForm } from "react-hook-form";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import { BsTrash } from 'react-icons/bs';
+import { getDistanceFromLatLonInKm } from '../utils/index'
 
 const ZOOM_LEVEL = 13;
 
@@ -12,12 +15,14 @@ const MapComponent = () => {
   const [apiCollaborators, setApiCollaborators] = useState<ICollaborator[]>();
   const [formsState, setFormsState] = useState<string>("");
   const [coordinates, setCoordinates] = useState<any>([]);
+  const [adjacency, setAdjacency] = useState<any>([]);
+  const [test, setTest] = useState<any>(null);
   const [position, setPosition] = useState(null);
-  const [selectedCollaborator, setSelectedCollaborator] =
-    useState<ICollaborator>();
+  const [update, setUpdate] = useState<any>(null);
+  const [selectedCollaborator, setSelectedCollaborator] = useState<ICollaborator>();
 
   function LocationMarker() {
-    const map = useMapEvents({
+    var map = useMapEvents({
       click(e: any) {
         if (!selectedCollaborator) return;
         setPosition(e.latlng);
@@ -33,6 +38,7 @@ const MapComponent = () => {
       y: position.lng.toString(),
       email: collaborator.email,
     });
+    setUpdate(update + 1);
   }
 
   async function savePosition() {
@@ -50,6 +56,12 @@ const MapComponent = () => {
     });
   }
 
+  async function getCoordinatesRelation(coordinates: number[]) {
+    return await axios.post(`http://localhost:3333/coordinates/get-all-relations`, {
+      baseCoordinateIds: coordinates
+    })
+  }
+
   useEffect(() => {
     getAllCollaborators();
   }, [formsState]);
@@ -58,8 +70,12 @@ const MapComponent = () => {
     if (!selectedCollaborator) return;
     getCoordinates().then((result) => {
       setCoordinates(result.data);
+      const ids = result.data.map((item: any) => item.id);
+      getCoordinatesRelation(ids).then((result2) => {
+        setAdjacency(result2.data);
+      })
     });
-  }, [selectedCollaborator]);
+  }, [selectedCollaborator, update]);
 
   const {
     register,
@@ -88,11 +104,48 @@ const MapComponent = () => {
       const collaborators = await axios.get(
         `http://localhost:3333/collaborators/all`,
         {
-          headers: { token: localStorage.getItem("token") },
+          headers: { token: localStorage.getItem("userToken") },
         }
       );
       setApiCollaborators(collaborators.data);
     } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async function createCoordinateRelation(baseCoordinate: any, destinyCoordinate: any, distance: number = 0) {
+    const finalDistance = getDistanceFromLatLonInKm(baseCoordinate.lat, baseCoordinate.lng, destinyCoordinate.lat, destinyCoordinate.lng);
+
+    try {
+      await axios.post(`http://localhost:3333/coordinates/create-relation`,
+        {
+          baseCoordinateId: baseCoordinate.id,
+          destinyCoordinateId: destinyCoordinate.id,
+          distance: finalDistance
+        }
+      )
+      setUpdate(update + 1);
+    } catch(e: any) {
+      toast.error(e.response.data.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  }
+
+  async function deleteRelation(id: number) {
+    try {
+      await axios.post(`http://localhost:3333/coordinates/delete-relation`, {
+        relationId: id
+      });
+      setUpdate(update + 1)
+    } catch(e:any) {
       console.log(e);
     }
   }
@@ -172,9 +225,9 @@ const MapComponent = () => {
         );
       case "selected":
         return (
-          <div className="flex w-96 flex-col">
+          <div className="flex h-screen w-96 flex-col overflow-y-scroll">
             <div className="flex h-20 w-full flex-col items-center justify-center bg-lime-500">
-              <div className="mb-2 flex w-full items-center">
+              <div className="mb-2 flex h-20 w-full items-center">
                 <IoIosArrowBack
                   size="1.5rem"
                   className="ml-2 cursor-pointer "
@@ -196,8 +249,29 @@ const MapComponent = () => {
                 className="mb-2 flex flex-col bg-neutral-200 px-2 py-2"
                 key={index}
               >
-                <span>Coordinate - {index}</span>
-                <button className="mt-4 rounded bg-white py-2">
+                <span>Coordinate - {item.id}</span>
+                {adjacency.length ? <span className="text-sm mt-2">Adjacent coordinates:</span> : null }
+                {
+                  adjacency.map((adj: any, index: any) => adj.baseCoordinateId == item.id ? (
+                    <div className="w-full bg-white flex items-center justify-between pr-2" key={index}>
+                      <div>Coordinate - {adj.destinyCoordinateId}</div>
+                      <BsTrash className="cursor-pointer" onClick={async () => await deleteRelation(adj.id)}/>
+                    </div>
+                  ) : null)
+                }
+                <select
+                  id="countries"
+                  className="block w-full rounded border-2 bg-gray-50 p-2.5 text-sm text-gray-900 mt-2"
+                  onChange={e => setTest(JSON.parse(e.target.value))}
+                >
+                  <option>Choose a coordinate</option>
+                  {coordinates.map((coordinate: any, index: any) =>
+                    coordinate.id !== item.id ? (
+                      <option value={JSON.stringify(coordinate)} key={index}>{coordinate.id}</option>
+                    ) : null
+                  )}
+                </select>
+                <button className="mt-4 rounded bg-white py-2" onClick={async () => await createCoordinateRelation(item, test)}>
                   Add coordinate adjacency
                 </button>
               </div>
@@ -244,6 +318,16 @@ const MapComponent = () => {
 
   return (
     <div className="flex h-full w-full">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnHover
+      />
+      <ToastContainer />
       <MapContainer
         center={[51.505, -0.09]}
         zoom={ZOOM_LEVEL}

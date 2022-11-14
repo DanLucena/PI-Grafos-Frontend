@@ -2,6 +2,8 @@ import React from "react";
 import type { NextPage } from "next";
 import { FieldValues, useForm } from "react-hook-form";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 const Create: NextPage = () => {
   const {
@@ -9,19 +11,54 @@ const Create: NextPage = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const router = useRouter();
 
   async function sendData(data: FieldValues) {
     const headers = {
       token: data.token,
     };
 
-    await axios.post(`http://localhost:3333/companies/create`, data, {
-      headers,
-    });
+    try {
+      await axios.post(`http://localhost:3333/companies/create`, data, {
+        headers,
+      });
+      toast.success("Company created", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      router.push("/");
+    } catch (e: any) {
+      toast.error(e.response.data.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
   }
 
   return (
     <div className="flex h-screen justify-center">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnHover
+      />
+      <ToastContainer />
       <div className="my-auto flex items-center justify-center">
         <div className="min-h-[732px] w-[480px] rounded border-2 p-3">
           <h1 className="mb-5 flex justify-center text-3xl font-semibold">

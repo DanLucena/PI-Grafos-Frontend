@@ -7,8 +7,6 @@ import {
 } from "react-icons/ai";
 import { TbReportAnalytics } from "react-icons/tb";
 import { BsGear } from "react-icons/bs";
-import { IoIosArrowDropright } from "react-icons/io";
-import { HiOutlineInboxArrowDown } from "react-icons/hi2";
 import { BiBell } from "react-icons/bi";
 import React from "react";
 
@@ -44,9 +42,6 @@ const SideBarMenu = () => {
         </li>
         <li className="mb-2 flex h-12 w-full cursor-pointer items-center justify-center rounded-lg hover:bg-neutral-300">
           <AiOutlineUserAdd size="1.4rem" className="cursor-pointer" />
-        </li>
-        <li className="mb-2 flex h-12 w-full cursor-pointer items-center justify-center rounded-lg hover:bg-neutral-300">
-          <HiOutlineInboxArrowDown size="1.5rem" className="cursor-pointer" />
         </li>
         <li className="mb-2 flex h-12 w-full cursor-pointer items-center justify-center rounded-lg hover:bg-neutral-300">
           <BsGear size="1.4rem" className="cursor-pointer" />

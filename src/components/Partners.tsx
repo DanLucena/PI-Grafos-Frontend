@@ -33,8 +33,8 @@ const Partners = () => {
           Trusted by more than 10k users
         </h1>
         <div className="flex flex-wrap justify-center gap-4">
-          {partners.map((item) => (
-            <PartnersBubbles name={item.name} logo={item.logo} />
+          {partners.map((item, index) => (
+            <PartnersBubbles key={index} name={item.name} logo={item.logo} />
           ))}
         </div>
       </div>

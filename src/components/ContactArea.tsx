@@ -30,7 +30,7 @@ const ContactArea = () => {
             id="countries"
             className="block w-6/12 rounded border-2 bg-gray-50 p-2.5 text-sm text-gray-900"
           >
-            <option selected>Choose a section</option>
+            <option>Choose a section</option>
             <option value="Sales">Sales</option>
             <option value="Engineering">Engineering</option>
             <option value="Administrative">Administrative</option>
