@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { CgMenu } from "react-icons/cg";
 import { MobileMenu } from "./MobileMenu";
+import { Link, animateScroll as scroll } from 'react-scroll';
 
 interface IProps {
   openModal: () => void;
@@ -30,10 +31,10 @@ const HomePageMenu = ({ openModal }: IProps) => {
           onClick={() => setIsOpen(true)}
         />
         <ul className="hidden md:flex">
-          <li className="cursor-pointer font-semibold">About Us</li>
-          <li className="ml-7 cursor-pointer font-semibold">Services</li>
-          <li className="ml-7 cursor-pointer font-semibold">Pricing</li>
-          <li className="ml-7 cursor-pointer font-semibold">Contact Us</li>
+          <li className="cursor-pointer font-semibold"><Link to="about" spy={true} smooth={true} offset={50} duration={500}>About Us</Link></li>
+          <li className="ml-7 cursor-pointer font-semibold"><Link to="services" spy={true} smooth={true} offset={50} duration={500}>Services</Link></li>
+          <li className="ml-7 cursor-pointer font-semibold"><Link to="pricing" spy={true} smooth={true} offset={50} duration={500}>Pricing</Link></li>
+          <li className="ml-7 cursor-pointer font-semibold"><Link to="contact" spy={true} smooth={true} offset={50} duration={500}>Contact Us</Link></li>
         </ul>
         <button
           onClick={() => {

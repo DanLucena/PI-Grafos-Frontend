@@ -22,8 +22,8 @@ const CollaboratorCard = (props: IProps) => {
       <p className="text-xs">
         Email: <span>{props.email}</span>
       </p>
-      <p className="text-xs">
-        Value: <span>R$ {props.balance}</span>
+      <p className="text-xs font-semibold">
+        Value: <span>R$ {props.balance.toFixed(2)}</span>
       </p>
     </div>
   );

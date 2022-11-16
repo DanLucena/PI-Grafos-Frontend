@@ -7,7 +7,7 @@ import { SiVisa } from "react-icons/si";
 const CreditCard = () => {
   return (
     <>
-      <div className="absolute -left-36 bottom-48 z-10 h-[19rem] w-[33rem] rotate-[68deg] rounded-[3rem] border-4 border-white p-8 backdrop-blur">
+      <div className="absolute -left-40 bottom-48 z-10 h-[19rem] w-[33rem] rotate-[68deg] rounded-[3rem] border-4 border-white p-8 backdrop-blur">
         <div className="">
           <p className="text-xl text-white">Balance</p>
           <p className="text-xl text-white">$5,756</p>

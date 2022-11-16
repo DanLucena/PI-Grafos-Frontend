@@ -1,13 +1,12 @@
-import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
+import { MapContainer, Marker, TileLayer, useMapEvents, Tooltip, Polyline } from "react-leaflet";
 import { CollaboratorCard } from "./CollaboratorCard";
 import { IoIosArrowBack } from "react-icons/io";
 import React, { useState, useEffect } from "react";
 import { ICollaborator } from "../interfaces/Collaborator";
 import { FieldValues, useForm } from "react-hook-form";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import { BsTrash } from 'react-icons/bs';
-import { getDistanceFromLatLonInKm } from '../utils/index'
+import {BsTrash} from 'react-icons/bs'
+import { truncateString } from "../utils";
 
 const ZOOM_LEVEL = 13;
 
@@ -15,14 +14,13 @@ const MapComponent = () => {
   const [apiCollaborators, setApiCollaborators] = useState<ICollaborator[]>();
   const [formsState, setFormsState] = useState<string>("");
   const [coordinates, setCoordinates] = useState<any>([]);
-  const [adjacency, setAdjacency] = useState<any>([]);
-  const [test, setTest] = useState<any>(null);
+  const [route, setRoute] = useState<any>([]);
   const [position, setPosition] = useState(null);
   const [update, setUpdate] = useState<any>(null);
   const [selectedCollaborator, setSelectedCollaborator] = useState<ICollaborator>();
 
   function LocationMarker() {
-    var map = useMapEvents({
+    const map = useMapEvents({
       click(e: any) {
         if (!selectedCollaborator) return;
         setPosition(e.latlng);
@@ -41,6 +39,14 @@ const MapComponent = () => {
     setUpdate(update + 1);
   }
 
+  async function calculateValue(collaboratorId?: number) {
+    const result = await axios.post(`http://localhost:3333/coordinates/calculate`, {
+      collaboratorId: collaboratorId
+    });
+    setRoute(result.data.route);
+    setUpdate(update + 1);
+  }
+
   async function savePosition() {
     if (!position) return;
     setCoordinates([...coordinates, position]);
@@ -56,24 +62,25 @@ const MapComponent = () => {
     });
   }
 
-  async function getCoordinatesRelation(coordinates: number[]) {
-    return await axios.post(`http://localhost:3333/coordinates/get-all-relations`, {
-      baseCoordinateIds: coordinates
-    })
+  async function deleteCoordinate(id: number) {
+    await axios.post(`http://localhost:3333/coordinates/delete`, {
+      id
+    });
+    setUpdate(update + 1);
   }
 
   useEffect(() => {
-    getAllCollaborators();
-  }, [formsState]);
+    getAllCollaborators().then((result) => {
+      setApiCollaborators(result.data);
+      const balance = result.data.find((collaborator: any) => collaborator.id == selectedCollaborator?.id);
+      setSelectedCollaborator(balance);
+    });
+  }, [formsState, update]);
 
   useEffect(() => {
     if (!selectedCollaborator) return;
     getCoordinates().then((result) => {
       setCoordinates(result.data);
-      const ids = result.data.map((item: any) => item.id);
-      getCoordinatesRelation(ids).then((result2) => {
-        setAdjacency(result2.data);
-      })
     });
   }, [selectedCollaborator, update]);
 
@@ -83,15 +90,16 @@ const MapComponent = () => {
     formState: { errors },
   } = useForm();
 
-  function selectCollaborator(collaborator: ICollaborator) {
+  async function selectCollaborator(collaborator: ICollaborator) {
     setSelectedCollaborator(collaborator);
     setFormsState("selected");
+    await calculateValue(collaborator.id);
   }
 
   async function createCollaborator(data: FieldValues) {
     try {
       await axios.post(`http://localhost:3333/collaborators/create`, data, {
-        headers: { token: localStorage.getItem("token") },
+        headers: { token: localStorage.getItem("userToken") },
       });
       setFormsState("");
     } catch (e) {
@@ -100,54 +108,21 @@ const MapComponent = () => {
   }
 
   async function getAllCollaborators() {
-    try {
-      const collaborators = await axios.get(
+    return await axios.get(
         `http://localhost:3333/collaborators/all`,
         {
           headers: { token: localStorage.getItem("userToken") },
         }
       );
-      setApiCollaborators(collaborators.data);
-    } catch (e) {
-      console.log(e);
-    }
   }
 
-  async function createCoordinateRelation(baseCoordinate: any, destinyCoordinate: any, distance: number = 0) {
-    const finalDistance = getDistanceFromLatLonInKm(baseCoordinate.lat, baseCoordinate.lng, destinyCoordinate.lat, destinyCoordinate.lng);
+  function totalCost(collaborators?: ICollaborator[]) {
+    let total = 0;
+    collaborators?.forEach((collaborator: ICollaborator) => {
+      total += collaborator.balance;
+    });
 
-    try {
-      await axios.post(`http://localhost:3333/coordinates/create-relation`,
-        {
-          baseCoordinateId: baseCoordinate.id,
-          destinyCoordinateId: destinyCoordinate.id,
-          distance: finalDistance
-        }
-      )
-      setUpdate(update + 1);
-    } catch(e: any) {
-      toast.error(e.response.data.message, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    }
-  }
-
-  async function deleteRelation(id: number) {
-    try {
-      await axios.post(`http://localhost:3333/coordinates/delete-relation`, {
-        relationId: id
-      });
-      setUpdate(update + 1)
-    } catch(e:any) {
-      console.log(e);
-    }
+    return total;
   }
 
   function renderedComponents(params: string) {
@@ -227,7 +202,7 @@ const MapComponent = () => {
         return (
           <div className="flex h-screen w-96 flex-col overflow-y-scroll">
             <div className="flex h-20 w-full flex-col items-center justify-center bg-lime-500">
-              <div className="mb-2 flex h-20 w-full items-center">
+              <div className="flex h-20 w-full items-center">
                 <IoIosArrowBack
                   size="1.5rem"
                   className="ml-2 cursor-pointer "
@@ -236,44 +211,24 @@ const MapComponent = () => {
                     setCoordinates([]);
                     setSelectedCollaborator(undefined);
                     setPosition(null);
+                    setRoute([]);
                   }}
                   color={"white"}
                 />
                 <h1 className="ml-auto mr-3 text-2xl text-white drop-shadow-md">
-                  {selectedCollaborator?.name}
+                  {truncateString(selectedCollaborator?.name as string)}
                 </h1>
               </div>
+              <span className="mb-2">Monthly transit cost: <span className="font-semibold">R$ {selectedCollaborator?.balance.toFixed(2)}</span></span>
             </div>
+            <button className="ml-auto w-6/12 h-8 bg-yellow-300 mb-2 rounded-b-lg" onClick={async () => await calculateValue(selectedCollaborator?.id)}>Calculate cost</button>
             {coordinates.map((item: any, index: any) => (
               <div
-                className="mb-2 flex flex-col bg-neutral-200 px-2 py-2"
+                className="mb-2 flex bg-neutral-200 px-2 py-2 items-center justify-between"
                 key={index}
               >
                 <span>Coordinate - {item.id}</span>
-                {adjacency.length ? <span className="text-sm mt-2">Adjacent coordinates:</span> : null }
-                {
-                  adjacency.map((adj: any, index: any) => adj.baseCoordinateId == item.id ? (
-                    <div className="w-full bg-white flex items-center justify-between pr-2" key={index}>
-                      <div>Coordinate - {adj.destinyCoordinateId}</div>
-                      <BsTrash className="cursor-pointer" onClick={async () => await deleteRelation(adj.id)}/>
-                    </div>
-                  ) : null)
-                }
-                <select
-                  id="countries"
-                  className="block w-full rounded border-2 bg-gray-50 p-2.5 text-sm text-gray-900 mt-2"
-                  onChange={e => setTest(JSON.parse(e.target.value))}
-                >
-                  <option>Choose a coordinate</option>
-                  {coordinates.map((coordinate: any, index: any) =>
-                    coordinate.id !== item.id ? (
-                      <option value={JSON.stringify(coordinate)} key={index}>{coordinate.id}</option>
-                    ) : null
-                  )}
-                </select>
-                <button className="mt-4 rounded bg-white py-2" onClick={async () => await createCoordinateRelation(item, test)}>
-                  Add coordinate adjacency
-                </button>
+                <BsTrash className="cursor-pointer" onClick={async () => await deleteCoordinate(item.id)}/>
               </div>
             ))}
             <button
@@ -286,7 +241,7 @@ const MapComponent = () => {
         );
       default:
         return (
-          <div className="w-96 px-2 shadow-md">
+          <div className="w-96 h-screen px-2 shadow-md overflow-y-scroll flex flex-col">
             <h1 className="mt-2 mb-5 flex justify-center text-xl">
               Collaborators
             </h1>
@@ -296,7 +251,7 @@ const MapComponent = () => {
             >
               +
             </button>
-            {apiCollaborators?.map((collaborator: ICollaborator) => {
+            {apiCollaborators?.sort((a, b)=>  {return a.id - b.id}).map((collaborator: ICollaborator) => {
               return (
                 <CollaboratorCard
                   key={collaborator.id}
@@ -311,6 +266,9 @@ const MapComponent = () => {
                 />
               );
             })}
+            <div className="mt-auto">
+              Total Cost: <span className="font-semibold">R$ {totalCost(apiCollaborators).toFixed(2)}</span>
+            </div>
           </div>
         );
     }
@@ -318,16 +276,6 @@ const MapComponent = () => {
 
   return (
     <div className="flex h-full w-full">
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnHover
-      />
-      <ToastContainer />
       <MapContainer
         center={[51.505, -0.09]}
         zoom={ZOOM_LEVEL}
@@ -335,9 +283,12 @@ const MapComponent = () => {
       >
         <TileLayer url="https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9iYmF0bWFuIiwiYSI6ImNrZzgzZ2JzbDBkYnEycW15NTV3bzBsbGgifQ.33I4ABckf8ciQZ2NCd1MEw"></TileLayer>
         {coordinates.map((position: any, index: any) => (
-          <Marker position={position} key={index}></Marker>
+          <Marker position={position} key={index}>
+            <Tooltip>Coordinate - {position.id}</Tooltip>
+          </Marker>
         ))}
         <LocationMarker />
+        <Polyline pathOptions={{ color: 'grey' }} positions={route} />
       </MapContainer>
       {renderedComponents(formsState)}
     </div>

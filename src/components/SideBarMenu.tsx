@@ -9,6 +9,7 @@ import { TbReportAnalytics } from "react-icons/tb";
 import { BsGear } from "react-icons/bs";
 import { BiBell } from "react-icons/bi";
 import React from "react";
+import ReactTooltip from "react-tooltip";
 
 const SideBarMenu = () => {
   const router = useRouter();
@@ -31,26 +32,40 @@ const SideBarMenu = () => {
         <li className="mb-2 flex h-12 w-full cursor-pointer items-center justify-center rounded-lg hover:bg-neutral-300">
           <AiOutlineHome size="1.5rem" className="cursor-pointer" />
         </li>
-        <li className="mb-2 flex h-12 w-full cursor-pointer items-center justify-center rounded-lg hover:bg-neutral-300">
-          <BiBell size="1.5rem" className="cursor-pointer" />
+        <li data-tip data-for='notify' className="mb-2 flex h-12 w-full items-center justify-center rounded-lg">
+          <BiBell size="1.5rem" color="#aaa"/>
         </li>
-        <li className="mb-2 flex h-12 w-full cursor-pointer items-center justify-center rounded-lg hover:bg-neutral-300">
-          <AiOutlineDashboard size="1.5rem" className="cursor-pointer" />
+        <ReactTooltip id='notify' effect='solid'>
+          <span>Coming soon</span>
+        </ReactTooltip>
+        <li data-tip data-for='dashboard' className="mb-2 flex h-12 w-full items-center justify-center rounded-lg">
+          <AiOutlineDashboard size="1.5rem" color="#aaa"/>
         </li>
-        <li className="mb-2 flex h-12 w-full cursor-pointer items-center justify-center rounded-lg hover:bg-neutral-300">
-          <TbReportAnalytics size="1.5rem" className="cursor-pointer" />
+        <ReactTooltip id='dashboard' effect='solid'>
+          <span>Coming soon</span>
+        </ReactTooltip>
+        <li data-tip data-for='reports' className="mb-2 flex h-12 w-full items-center justify-center rounded-lg">
+          <TbReportAnalytics size="1.5rem" color="#aaa"/>
         </li>
-        <li className="mb-2 flex h-12 w-full cursor-pointer items-center justify-center rounded-lg hover:bg-neutral-300">
-          <AiOutlineUserAdd size="1.4rem" className="cursor-pointer" />
+        <ReactTooltip id='reports' effect='solid'>
+          <span>Coming soon</span>
+        </ReactTooltip>
+        <li data-tip data-for='users' className="mb-2 flex h-12 w-full items-center justify-center rounded-lg">
+          <AiOutlineUserAdd size="1.4rem" color="#aaa"/>
         </li>
-        <li className="mb-2 flex h-12 w-full cursor-pointer items-center justify-center rounded-lg hover:bg-neutral-300">
-          <BsGear size="1.4rem" className="cursor-pointer" />
+        <ReactTooltip id='users' effect='solid'>
+          <span>Coming soon</span>
+        </ReactTooltip>
+        <li data-tip data-for='options' className="mb-2 flex h-12 w-full items-center justify-center rounded-lg">
+          <BsGear size="1.4rem" color="#aaa"/>
         </li>
-        <li className="mt-auto flex h-12 w-full cursor-pointer items-center justify-center rounded-lg hover:bg-neutral-300">
+        <ReactTooltip id='options' effect='solid'>
+          <span>Coming soon</span>
+        </ReactTooltip>
+        <li className="mt-auto cursor-pointer flex h-12 w-full items-center justify-center rounded-lg hover:bg-neutral-300" onClick={() => logoutHandler()}>
           <AiOutlinePoweroff
             size="1.5rem"
             className="cursor-pointer"
-            onClick={() => logoutHandler()}
           />
         </li>
       </ul>

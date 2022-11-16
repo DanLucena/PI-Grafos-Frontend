@@ -1,3 +1,4 @@
+import React from "react";
 import type { NextPage } from "next";
 import { HomePageMenu } from "../components/HomePageMenu";
 import { PricingSection } from "../components/PricingSection";
@@ -38,7 +39,7 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <section className="h-screen overflow-x-hidden">
+      <section className="h-screen">
         <LoginModal isOpen={isModalOpen} closeModal={closeModal} />
         <div className="flex h-5/6">
           <div className="py-8 px-8 md:px-16 xl:w-9/12">
@@ -64,7 +65,7 @@ const Home: NextPage = () => {
             <BackCreditCard />
           </div>
         </div>
-        <div className="flex h-2/6 w-full items-center bg-black pl-16 lg:px-24">
+        <div id="about" className="flex h-2/6 w-full items-center bg-black pl-16 lg:px-24">
           <div className="text-white md:mr-16 md:w-8/12 lg:w-5/12 xl:w-3/12">
             <p className="text-4xl font-light">Why Use</p>
             <p className="text-4xl font-semibold">Traveller</p>
@@ -103,7 +104,7 @@ const Home: NextPage = () => {
           </div>
         </div>
         <Partners />
-        <div className="mt-8 justify-center text-center lg:mt-10">
+        <div id="services" className="mt-8 justify-center text-center lg:mt-10">
           <h1 className="text-2xl font-medium text-neutral-800 md:text-3xl lg:text-4xl">
             Features that you get only
             <br /> in <span className="text-lime-500">Tra</span>veller
@@ -122,8 +123,12 @@ const Home: NextPage = () => {
             malesuada id tempus sed.
           </p>
         </div>
-        <PricingSection />
-        <ContactArea />
+        <div id="pricing">
+          <PricingSection />
+        </div>
+        <div id="contact">
+          <ContactArea />
+        </div>
         <Footer />
       </section>
     </>

@@ -15,4 +15,12 @@ function deg2rad(deg) {
   return deg * (Math.PI/180);
 }
 
-export { getDistanceFromLatLonInKm }
+
+function truncateString(str: string, num = 20) {
+  if (str.length <= num) {
+    return str
+  }
+  return str.slice(0, num) + '...'
+}
+
+export { getDistanceFromLatLonInKm, truncateString }
