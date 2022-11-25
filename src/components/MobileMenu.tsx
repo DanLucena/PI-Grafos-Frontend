@@ -14,7 +14,7 @@ const MobileMenu = ({ isOpen, closeMenu, openRegisterModal }: IProps) => {
   }
 
   return (
-    isOpen && (
+    isOpen ? (
       <>
         <div className="absolute top-0 left-0 z-50 flex h-full w-full flex-col bg-lime-500 py-3">
           <GrFormClose
@@ -46,7 +46,7 @@ const MobileMenu = ({ isOpen, closeMenu, openRegisterModal }: IProps) => {
           </button>
         </div>
       </>
-    )
+    ) : null
   );
 };
 

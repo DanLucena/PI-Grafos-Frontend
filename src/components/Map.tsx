@@ -2,13 +2,25 @@ import { MapContainer, Marker, TileLayer, useMapEvents, Tooltip, Polyline } from
 import { CollaboratorCard } from "./CollaboratorCard";
 import { IoIosArrowBack } from "react-icons/io";
 import React, { useState, useEffect } from "react";
-import { ICollaborator } from "../interfaces/Collaborator";
 import { FieldValues, useForm } from "react-hook-form";
 import axios from "axios";
 import {BsTrash} from 'react-icons/bs'
 import { truncateString } from "../utils";
+import L from "leaflet";
+import { createControlComponent } from "@react-leaflet/core";
+import "leaflet-routing-machine";
 
 const ZOOM_LEVEL = 13;
+
+interface ICollaborator {
+  id: number;
+  name: string;
+  email: string;
+  cellphone: string;
+  cpf: string;
+  balance: number;
+  companyId: number;
+}
 
 const MapComponent = () => {
   const [apiCollaborators, setApiCollaborators] = useState<ICollaborator[]>();
@@ -18,6 +30,21 @@ const MapComponent = () => {
   const [position, setPosition] = useState(null);
   const [update, setUpdate] = useState<any>(null);
   const [selectedCollaborator, setSelectedCollaborator] = useState<ICollaborator>();
+
+  const createRoutineMachineLayer = () => {
+    // @ts-ignore
+    const instance = L.Routing.control({
+      waypoints: route.map((item:any) => L.latLng(item[0], item[1])),
+      lineOptions: {
+        styles: [{ color: "#6FA1EC", weight: 4 }]
+      },
+      show: false,
+      addWaypoints: false,
+    });
+    return instance;
+  };
+
+  const RoutingMachine = createControlComponent(createRoutineMachineLayer);
 
   function LocationMarker() {
     const map = useMapEvents({
@@ -52,6 +79,7 @@ const MapComponent = () => {
     setCoordinates([...coordinates, position]);
     await saveInDatabase(position, selectedCollaborator);
     setPosition(null);
+    calculateValue(selectedCollaborator?.id);
   }
 
   async function getCoordinates() {
@@ -282,13 +310,8 @@ const MapComponent = () => {
         style={{ width: "100%", height: "100%" }}
       >
         <TileLayer url="https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9iYmF0bWFuIiwiYSI6ImNrZzgzZ2JzbDBkYnEycW15NTV3bzBsbGgifQ.33I4ABckf8ciQZ2NCd1MEw"></TileLayer>
-        {coordinates.map((position: any, index: any) => (
-          <Marker position={position} key={index}>
-            <Tooltip>Coordinate - {position.id}</Tooltip>
-          </Marker>
-        ))}
         <LocationMarker />
-        <Polyline pathOptions={{ color: 'grey' }} positions={route} />
+        <RoutingMachine />
       </MapContainer>
       {renderedComponents(formsState)}
     </div>

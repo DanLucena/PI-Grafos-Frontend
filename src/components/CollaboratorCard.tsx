@@ -1,5 +1,15 @@
 import React from "react";
-import { ICollaborator } from "../interfaces/Collaborator";
+
+
+interface ICollaborator {
+  id: number;
+  name: string;
+  email: string;
+  cellphone: string;
+  cpf: string;
+  balance: number;
+  companyId: number;
+}
 
 interface IProps {
   name: string;
